@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ECOLED – Turn Crossbeam Overlaps into Revenue</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0a0f2c;
+    --navy2: #0d1539;
+    --blue: #1a2560;
+    --accent: #2d6ef7;
+    --accent2: #5b8fff;
+    --glow: rgba(45,110,247,0.18);
+    --text: #e8eaf6;
+    --muted: #8a94b8;
+    --border: rgba(255,255,255,0.07);
+    --card: rgba(255,255,255,0.04);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 6%;
+    background: rgba(10,15,44,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: 2px; color: #fff; }
+  .logo span { color: var(--accent2); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color .2s; }
+  .nav-links a:hover { color: #fff; }
+  .nav-cta {
+    background: var(--accent); color: #fff; border: none; padding: 10px 22px;
+    border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    transition: background .2s, transform .15s;
+  }
+  .nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 120px 6% 80px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 700px;
+    background: radial-gradient(ellipse at center, rgba(45,110,247,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(45,110,247,0.12); border: 1px solid rgba(45,110,247,0.3);
+    color: var(--accent2); padding: 6px 16px; border-radius: 99px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+    margin-bottom: 28px; text-transform: uppercase;
+  }
+  .badge-dot { width: 7px; height: 7px; background: var(--accent2); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+  h1 {
+    font-size: clamp(2.4rem, 5.5vw, 4rem);
+    font-weight: 900; line-height: 1.15;
+    color: #fff; max-width: 820px; margin-bottom: 24px;
+  }
+  h1 em { font-style: normal; color: var(--accent2); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    color: var(--muted); max-width: 580px; margin-bottom: 44px;
+  }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 64px; }
+  .btn-primary {
+    background: var(--accent); color: #fff; border: none;
+    padding: 14px 32px; border-radius: 10px; font-size: 1rem;
+    font-weight: 700; cursor: pointer; transition: all .2s;
+    box-shadow: 0 0 32px rgba(45,110,247,0.4);
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); box-shadow: 0 0 48px rgba(45,110,247,0.6); }
+  .btn-ghost {
+    background: transparent; color: var(--text); border: 1px solid var(--border);
+    padding: 14px 32px; border-radius: 10px; font-size: 1rem;
+    font-weight: 600; cursor: pointer; transition: all .2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .hero-stats {
+    display: flex; gap: 48px; flex-wrap: wrap; justify-content: center;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-size: 2rem; font-weight: 900; color: #fff; }
+  .stat-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* LOGOS */
+  .logos-bar {
+    background: var(--navy2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 28px 6%; text-align: center;
+  }
+  .logos-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 20px; }
+  .logos-row { display: flex; align-items: center; justify-content: center; gap: 48px; flex-wrap: wrap; }
+  .logo-tag {
+    font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.25);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  /* HOW IT WORKS */
+  section { padding: 100px 6%; }
+  .section-label {
+    font-size: 0.78rem; color: var(--accent2); font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;
+  }
+  h2 {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800; color: #fff; max-width: 600px; line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-sub { color: var(--muted); max-width: 520px; margin-bottom: 60px; font-size: 1.05rem; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px; }
+  .step {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px 28px;
+    position: relative; transition: border-color .2s, transform .2s;
+  }
+  .step:hover { border-color: rgba(45,110,247,0.4); transform: translateY(-4px); }
+  .step-num {
+    font-size: 0.75rem; font-weight: 800; color: var(--accent); letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 16px;
+  }
+  .step-icon { font-size: 2rem; margin-bottom: 14px; }
+  .step h3 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .step p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+  .step-connector {
+    position: absolute; right: -13px; top: 50%;
+    transform: translateY(-50%); font-size: 1.2rem; color: var(--accent);
+    z-index: 1;
+  }
+
+  /* FEATURES */
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .feature-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px;
+    transition: border-color .2s, transform .2s;
+  }
+  .feature-card:hover { border-color: rgba(45,110,247,0.35); transform: translateY(-4px); }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: rgba(45,110,247,0.12); border: 1px solid rgba(45,110,247,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 20px;
+  }
+  .feature-card h3 { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .feature-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+
+  /* DASHBOARD MOCKUP */
+  .mockup-section { display: flex; gap: 60px; align-items: center; flex-wrap: wrap; }
+  .mockup-text { flex: 1; min-width: 280px; }
+  .mockup-text ul { list-style: none; display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+  .mockup-text li { display: flex; align-items: flex-start; gap: 12px; font-size: 0.95rem; color: var(--muted); }
+  .check { color: var(--accent2); font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+
+  .mockup-visual {
+    flex: 1.2; min-width: 300px;
+    background: rgba(13,21,57,0.8); border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .mock-header {
+    background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--border);
+    padding: 14px 20px; display: flex; align-items: center; gap: 10px;
+  }
+  .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mock-body { padding: 24px; }
+  .mock-title { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .mock-accounts { display: flex; flex-direction: column; gap: 10px; }
+  .mock-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+  }
+  .mock-company { font-size: 0.88rem; font-weight: 600; color: #fff; }
+  .mock-meta { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+  .score-badge {
+    padding: 4px 12px; border-radius: 99px; font-size: 0.78rem; font-weight: 700;
+  }
+  .score-high { background: rgba(52,211,153,0.15); color: #34d399; }
+  .score-med { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .score-low { background: rgba(239,68,68,0.1); color: #f87171; }
+  .ai-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.72rem; color: var(--accent2);
+    background: rgba(45,110,247,0.1); border: 1px solid rgba(45,110,247,0.2);
+    padding: 3px 10px; border-radius: 99px; margin-top: 8px;
+  }
+
+  /* PRICING */
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 24px; max-width: 960px; margin: 0 auto; }
+  .price-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 36px 32px;
+    position: relative; transition: transform .2s;
+  }
+  .price-card:hover { transform: translateY(-4px); }
+  .price-card.featured {
+    border-color: rgba(45,110,247,0.5);
+    background: linear-gradient(160deg, rgba(45,110,247,0.08) 0%, rgba(13,21,57,0.5) 100%);
+    box-shadow: 0 0 60px rgba(45,110,247,0.12);
+  }
+  .popular-tag {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: #fff; font-size: 0.72rem; font-weight: 700;
+    padding: 4px 16px; border-radius: 99px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .price-tier { font-size: 0.85rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+  .price-amount { font-size: 2.6rem; font-weight: 900; color: #fff; }
+  .price-amount span { font-size: 1rem; font-weight: 400; color: var(--muted); }
+  .price-desc { font-size: 0.88rem; color: var(--muted); margin: 10px 0 24px; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .price-features li { font-size: 0.88rem; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .price-features li::before { content: '✓'; color: var(--accent2); font-weight: 700; }
+  .btn-plan {
+    width: 100%; padding: 13px; border-radius: 10px; font-size: 0.95rem;
+    font-weight: 700; cursor: pointer; transition: all .2s;
+  }
+  .btn-plan-primary { background: var(--accent); color: #fff; border: none; }
+  .btn-plan-primary:hover { background: var(--accent2); }
+  .btn-plan-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-plan-outline:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* TESTIMONIALS */
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+  .testimonial {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 28px 24px;
+  }
+  .stars { color: #fbbf24; font-size: 0.9rem; margin-bottom: 14px; }
+  .testimonial p { font-size: 0.93rem; color: var(--text); line-height: 1.65; margin-bottom: 20px; font-style: italic; }
+  .t-author { display: flex; align-items: center; gap: 12px; }
+  .t-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1rem; color: #fff;
+  }
+  .t-name { font-size: 0.88rem; font-weight: 700; color: #fff; }
+  .t-role { font-size: 0.78rem; color: var(--muted); }
+
+  /* CTA */
+  .cta-section {
+    text-align: center; padding: 100px 6%;
+    background: linear-gradient(160deg, rgba(45,110,247,0.08) 0%, transparent 60%);
+    border-top: 1px solid var(--border);
+  }
+  .cta-section h2 { margin: 0 auto 16px; }
+  .cta-section p { color: var(--muted); max-width: 500px; margin: 0 auto 40px; font-size: 1.05rem; }
+
+  /* FOOTER */
+  footer {
+    background: var(--navy2); border-top: 1px solid var(--border);
+    padding: 40px 6%; display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: gap; gap: 20px;
+  }
+  .footer-links { display: flex; gap: 28px; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color .2s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-copy { font-size: 0.82rem; color: var(--muted); }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .hero-stats { gap: 28px; }
+    .step-connector { display: none; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">ECO<span>LED</span></div>
+
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="badge"><span class="badge-dot"></span> Built for Partnership Teams</div>
+  <h1>Turn Crossbeam Overlaps into <em>Closed Revenue</em></h1>
+  <p class="hero-sub">ECOLED automatically scores, researches, and drafts outreach for your partner overlaps — so your team closes deals instead of doing spreadsheet work.</p>
+  <div class="hero-btns" style="flex-direction:column;align-items:center;gap:12px">
+    <div style="display:flex;gap:0;max-width:460px;width:100%">
+      <input id="hero-email" type="email" placeholder="Enter your work email" style="flex:1;padding:14px 18px;border-radius:10px 0 0 10px;border:1px solid var(--border);border-right:none;background:rgba(255,255,255,0.06);color:#fff;font-size:0.95rem;outline:none;" />
+      <button class="btn-primary" style="border-radius:0 10px 10px 0;white-space:nowrap" onclick="submitWaitlist('hero-email','hero-msg')">Join Waitlist →</button>
+    </div>
+    <p id="hero-msg" style="font-size:0.8rem;color:var(--muted)">Early adopters get 3 months free · No credit card required</p>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">10×</div><div class="stat-label">Faster Overlap Review</div></div>
+    <div class="stat"><div class="stat-num">3hrs</div><div class="stat-label">Saved Per Rep/Week</div></div>
+    <div class="stat"><div class="stat-num">AI</div><div class="stat-label">Research in Seconds</div></div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<div class="logos-bar">
+  <p class="logos-label">Trusted by partner teams at</p>
+  <div class="logos-row">
+    <span class="logo-tag">HubSpot</span>
+    <span class="logo-tag">Apollo</span>
+    <span class="logo-tag">LeadIQ</span>
+    <span class="logo-tag">Warmly</span>
+    <span class="logo-tag">Claude</span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <p class="section-label">How It Works</p>
+  <h2>From Overlap to Outreach in Minutes</h2>
+  <p class="section-sub">ECOLED connects to Crossbeam, scores every overlap automatically, and generates AI-powered research and messaging — all without leaving the app.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">Step 01</div>
+      <div class="step-icon">🔗</div>
+      <h3>Connect Crossbeam</h3>
+      <p>Sync your Crossbeam account in one click. ECOLED pulls all your partner overlap data in real time.</p>
+      <div class="step-connector">›</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Step 02</div>
+      <div class="step-icon">⚡</div>
+      <h3>Auto-Score Accounts</h3>
+      <p>Our scoring engine ranks every overlap by deal size, mutual partner fit, and intent signals — instantly.</p>
+      <div class="step-connector">›</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Step 03</div>
+      <div class="step-icon">🧠</div>
+      <h3>AI Research</h3>
+      <p>Get a company brief, stakeholder map, and partner angle for every top-scored account — generated by AI.</p>
+      <div class="step-connector">›</div>
+    </div>
+    <div class="step">
+      <div class="step-num">Step 04</div>
+      <div class="step-icon">✉️</div>
+      <h3>Send Outreach</h3>
+      <p>Launch personalized, co-sell emails directly from ECOLED. Track replies and pipeline attribution.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- DASHBOARD MOCKUP -->
+<section>
+  <div class="mockup-section">
+    <div class="mockup-text">
+      <p class="section-label">Smart Scoring</p>
+      <h2>Know Which Overlaps to Chase First</h2>
+      <p style="color:var(--muted);font-size:0.95rem;">Stop guessing. ECOLED's scoring engine surfaces the accounts most likely to close — using overlap depth, firmographics, partner tier, and real-time intent data.</p>
+      <ul>
+        <li><span class="check">✓</span> Weighted scoring by overlap type (customer-prospect, prospect-prospect)</li>
+        <li><span class="check">✓</span> Enriched firmographic signals pulled automatically</li>
+        <li><span class="check">✓</span> AI-generated account summaries in one click</li>
+        <li><span class="check">✓</span> Full CRM attribution to track partner-sourced pipeline</li>
+      </ul>
+    </div>
+    <div class="mockup-visual">
+      <div class="mock-header">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <span style="font-size:0.8rem;color:var(--muted);margin-left:8px;">ECOLED — Overlap Dashboard</span>
+      </div>
+      <div class="mock-body">
+        <div class="mock-title">Top Scored Overlaps · 14 Accounts</div>
+        <div class="mock-accounts">
+          <div class="mock-row">
+            <div>
+              <div class="mock-company">Acme Corp</div>
+              <div class="mock-meta">via Salesforce · $250K ACV</div>
+              <div class="ai-chip">✦ AI research ready</div>
+            </div>
+            <span class="score-badge score-high">Score 94</span>
+          </div>
+          <div class="mock-row">
+            <div>
+              <div class="mock-company">Fintech Labs</div>
+              <div class="mock-meta">via HubSpot · $120K ACV</div>
+              <div class="ai-chip">✦ AI research ready</div>
+            </div>
+            <span class="score-badge score-high">Score 87</span>
+          </div>
+          <div class="mock-row">
+            <div>
+              <div class="mock-company">NovaSaaS Inc</div>
+              <div class="mock-meta">via Gong · $80K ACV</div>
+            </div>
+            <span class="score-badge score-med">Score 61</span>
+          </div>
+          <div class="mock-row">
+            <div>
+              <div class="mock-company">RetailEdge Co</div>
+              <div class="mock-meta">via Outreach · $40K ACV</div>
+            </div>
+            <span class="score-badge score-low">Score 32</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="section-label">Features</p>
+  <h2>Everything Your Partner Team Needs</h2>
+  <p class="section-sub">One platform to go from raw Crossbeam data to booked meetings — without stitching together five tools.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <h3>Crossbeam Sync</h3>
+      <p>Real-time, automatic sync with your Crossbeam account. Always see the freshest overlaps without manual exports.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Overlap Scoring Engine</h3>
+      <p>Configurable scoring weights by overlap type, deal size, partner tier, and custom signals. Know what to prioritize.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>AI Account Research</h3>
+      <p>One-click AI briefs that surface company background, buyer personas, partner angle, and talking points.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✉️</div>
+      <h3>Automated Outreach</h3>
+      <p>Personalized co-sell email sequences drafted by AI and sent directly from ECOLED. Track open and reply rates.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📈</div>
+      <h3>Pipeline Attribution</h3>
+      <p>Track every deal influenced by a partner overlap. Prove the ROI of your partnership program with hard data.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔐</div>
+      <h3>Secure OAuth Login</h3>
+      <p>Enterprise-grade authentication with Google and Microsoft SSO. No passwords, no friction, no security headaches.</p>
+    </div>
+  </div>
+</section>
+
+
+<hr class="divider" />
+
+<!-- PRICING -->
+<section id="pricing">
+  <p class="section-label" style="text-align:center">Pricing</p>
+  <h2 style="text-align:center;margin:0 auto 12px">Simple, Transparent Pricing</h2>
+  <p class="section-sub" style="text-align:center;margin:0 auto 56px">Start free. Scale as your partnership program grows.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">Starter</div>
+      <div class="price-amount">$0<span>/mo</span></div>
+      <div class="price-desc">For solo partnership managers getting started.</div>
+      <ul class="price-features">
+        <li>1 user</li>
+        <li>Up to 100 account overlaps/month</li>
+        <li>Basic scoring</li>
+      </ul>
+    </div>
+    <div class="price-card featured">
+      <div class="popular-tag">Most Popular</div>
+      <div class="price-tier">Growth</div>
+      <div class="price-amount">$299<span>/mo</span></div>
+      <div class="price-desc">For growing partner teams with active co-sell motions.</div>
+      <ul class="price-features">
+        <li>1 user</li>
+        <li>Up to 1,000 account overlaps/month</li>
+        <li>Advanced scoring + custom weights</li>
+        <li>Unlimited AI research</li>
+        <li>Automated outreach sequences</li>
+        <li>CRM attribution reporting</li>
+      </ul>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">Enterprise</div>
+      <div class="price-amount">Custom</div>
+      <div class="price-desc">For large orgs with multiple partner programs and integrations.</div>
+      <ul class="price-features">
+        <li>Unlimited overlaps</li>
+        <li>Custom integrations & API</li>
+        <li>SSO & advanced security</li>
+        <li>Dedicated CSM</li>
+        <li>Unlimited seats</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-label">Get Started</p>
+  <h2 style="margin:0 auto 16px">Ready to Unlock Your Crossbeam Overlaps?</h2>
+  <p>Join the waitlist and be first to access ECOLED when we launch. Early adopters get 3 months free on any paid plan.</p>
+  <div class="hero-btns" style="justify-content:center;flex-direction:column;align-items:center;gap:12px">
+    <div style="display:flex;gap:0;max-width:460px;width:100%">
+      <input id="cta-email" type="email" placeholder="Enter your work email" style="flex:1;padding:14px 18px;border-radius:10px 0 0 10px;border:1px solid var(--border);border-right:none;background:rgba(255,255,255,0.06);color:#fff;font-size:0.95rem;outline:none;" />
+      <button class="btn-primary" style="border-radius:0 10px 10px 0;white-space:nowrap" onclick="submitWaitlist('cta-email','cta-msg')">Join Waitlist →</button>
+    </div>
+    <p id="cta-msg" style="font-size:0.8rem;color:var(--muted)">Early adopters get 3 months free · No credit card required</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">ECO<span>LED</span></div>
+  <div class="footer-copy">© 2026 ECOLED. All rights reserved.</div>
+</footer>
+
+<script>
+async function submitWaitlist(inputId, msgId) {
+  const input = document.getElementById(inputId);
+  const msg = document.getElementById(msgId);
+  const email = input.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.style.color = '#f87171';
+    msg.textContent = 'Please enter a valid email address.';
+    return;
+  }
+  msg.style.color = 'var(--muted)';
+  msg.textContent = 'Submitting...';
+  try {
+    const res = await fetch('https://app.loops.so/api/newsletter-form/cmmo0ai9q02lh0i3kqvdpjzmp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (data.success) {
+      msg.style.color = '#34d399';
+      msg.textContent = "🎉 You're on the list! We'll be in touch soon.";
+      input.value = '';
+    } else {
+      throw new Error('Failed');
+    }
+  } catch {
+    msg.style.color = '#f87171';
+    msg.textContent = 'Something went wrong. Please try again.';
+  }
+}
+</script>
+</body>
+</html>
