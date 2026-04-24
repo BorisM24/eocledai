@@ -168,7 +168,7 @@ const pricing = [
       "Basic scoring",
       "AI research briefs",
     ],
-    cta: "Get Started Free",
+    cta: "Join Waitlist",
     featured: false,
   },
   {
@@ -201,7 +201,7 @@ const pricing = [
       "SLA + SSO",
       "Custom integrations",
     ],
-    cta: "Talk to Us",
+    cta: "Join Waitlist",
     featured: false,
   },
 ];
