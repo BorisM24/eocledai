@@ -206,7 +206,6 @@ const pricing = [
   },
 ];
 
-const trustedBy = ["HubSpot", "Apollo", "LeadIQ", "Warmly", "Claude AI"];
 
 const faqs = [
   {
@@ -399,19 +398,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TRUSTED BY */}
-      <section style={{ padding: "48px 24px", borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
-          <p style={{ fontSize: 12, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 28 }}>
-            Built for teams already using
-          </p>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "clamp(24px, 5vw, 60px)", flexWrap: "wrap" }}>
-            {trustedBy.map((name) => (
-              <span key={name} className="logo-bar-item">{name}</span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* STATS */}
       <section style={{ padding: "80px 24px" }}>
