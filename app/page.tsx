@@ -307,7 +307,7 @@ export default function Home() {
         <div style={{ maxWidth: 820, margin: "0 auto", padding: "0 24px" }}>
           <div className="badge animate-fade-up" style={{ marginBottom: 28, display: "inline-flex" }}>
             <span className="badge-dot" />
-            Now in private beta · Join the waitlist
+            Coming soon · Join the waitlist
           </div>
 
           <h1 className="animate-fade-up delay-100" style={{
@@ -339,7 +339,7 @@ export default function Home() {
           </div>
 
           <p className="animate-fade-up delay-400" style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 16 }}>
-            Free to start · No credit card required · Built for Crossbeam users
+            Built for Crossbeam users
           </p>
         </div>
 
@@ -368,9 +368,6 @@ export default function Home() {
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ff5f57" }} />
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#febc2e" }} />
               <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28c840" }} />
-              <div style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--text-muted)" }}>
-                app.ecoled.io — Accounts Dashboard
-              </div>
             </div>
             {/* Dashboard content */}
             <div style={{ padding: "28px 28px 20px", textAlign: "left" }}>
