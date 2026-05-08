@@ -173,8 +173,8 @@ const pricing = [
   },
   {
     name: "Growth",
-    price: "$299",
-    period: "/month",
+    price: "Coming soon",
+    period: "",
     desc: "For partnership teams ready to scale.",
     features: [
       "1,000 overlaps / month",
@@ -407,7 +407,6 @@ export default function Home() {
               { value: "10x", label: "Faster than manual outreach" },
               { value: "24/7", label: "Overlap monitoring & sync" },
               { value: "100%", label: "Human-approved outreach" },
-              { value: "$0", label: "To get started" },
             ].map((stat, i) => (
               <div key={i} style={{
                 textAlign: "center",
