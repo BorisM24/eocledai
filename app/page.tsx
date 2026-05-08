@@ -1,6 +1,41 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import {
+  Link2,
+  Zap,
+  Sparkles,
+  Send,
+  LineChart,
+  Target,
+  Brain,
+  UserCheck,
+  RefreshCw,
+  Mails,
+  TrendingUp,
+  type LucideIcon,
+} from "lucide-react";
+
+function IconBadge({ Icon }: { Icon: LucideIcon }) {
+  return (
+    <div
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 10,
+        background:
+          "linear-gradient(135deg, rgba(45,110,247,0.15), rgba(45,110,247,0.05))",
+        border: "1px solid rgba(45,110,247,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      <Icon size={20} strokeWidth={1.75} color="#5b8fff" />
+    </div>
+  );
+}
 
 const LOOPS_ENDPOINT =
   "https://app.loops.so/api/newsletter-form/cmmo0aiq02lh0i3kqvdpjzmp";
@@ -89,67 +124,67 @@ function WaitlistForm({ size = "large" }: { size?: "large" | "small" }) {
   );
 }
 
-const steps = [
+const steps: { n: string; Icon: LucideIcon; title: string; desc: string }[] = [
   {
     n: "01",
-    icon: "🔗",
+    Icon: Link2,
     title: "Connect Crossbeam",
     desc: "Link your Crossbeam instance in seconds via API. ECOLED instantly syncs all your partner overlap accounts.",
   },
   {
     n: "02",
-    icon: "⚡",
+    Icon: Zap,
     title: "Score Your Overlaps",
     desc: "A configurable scoring engine ranks accounts by fit, intent, and partnership stage — no more spreadsheet guessing.",
   },
   {
     n: "03",
-    icon: "🤖",
+    Icon: Sparkles,
     title: "AI Research Briefs",
     desc: "One click generates a full account brief: company summary, buyer personas, partner angle, and custom talking points.",
   },
   {
     n: "04",
-    icon: "📬",
+    Icon: Send,
     title: "Launch Co-Sell Outreach",
     desc: "Send personalized co-sell sequences via email (Instantly) or LinkedIn (HeyReach). You approve every message first.",
   },
   {
     n: "05",
-    icon: "📊",
+    Icon: LineChart,
     title: "Track Attribution",
     desc: "See exactly which deals were influenced by partner overlaps. Close the loop on every pipeline contribution.",
   },
 ];
 
-const features = [
+const features: { Icon: LucideIcon; title: string; desc: string }[] = [
   {
-    icon: "🎯",
+    Icon: Target,
     title: "Priority Scoring",
     desc: "Weighted scoring rules surface your highest-value overlaps automatically. Focus on accounts that will close, not just accounts that exist.",
   },
   {
-    icon: "🧠",
+    Icon: Brain,
     title: "Claude-Powered Research",
     desc: "Every account gets an AI brief with company background, key contacts, partnership angle, and ready-to-use talking points.",
   },
   {
-    icon: "✍️",
+    Icon: UserCheck,
     title: "Human-in-the-Loop",
     desc: "You approve every outreach message before it sends. AI does the heavy lifting; you stay in control of your relationships.",
   },
   {
-    icon: "🔄",
+    Icon: RefreshCw,
     title: "Auto-Sync Every 6 Hours",
     desc: "Crossbeam data stays fresh automatically. New overlaps surface in real time — no manual exports, ever.",
   },
   {
-    icon: "📤",
+    Icon: Mails,
     title: "Multi-Channel Outreach",
     desc: "Email via Instantly or LinkedIn via HeyReach — your choice. One workflow, two channels, full attribution.",
   },
   {
-    icon: "📈",
+    Icon: TrendingUp,
     title: "Pipeline Attribution",
     desc: "Know exactly which partner overlaps are moving pipeline. Prove the ROI of your partnership program with hard data.",
   },
@@ -448,7 +483,7 @@ export default function Home() {
                 </div>
                 {/* Right: content */}
                 <div className="card card-hover" style={{ flex: 1, padding: "28px 32px", display: "flex", gap: 20, alignItems: "flex-start" }}>
-                  <span style={{ fontSize: 28 }}>{step.icon}</span>
+                  <IconBadge Icon={step.Icon} />
                   <div>
                     <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{step.title}</h3>
                     <p style={{ color: "var(--text-muted)", fontSize: 15, lineHeight: 1.6 }}>{step.desc}</p>
@@ -474,7 +509,9 @@ export default function Home() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
             {features.map((f, i) => (
               <div key={i} className="card card-hover" style={{ padding: "28px 28px" }}>
-                <div style={{ fontSize: 28, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ marginBottom: 18 }}>
+                  <IconBadge Icon={f.Icon} />
+                </div>
                 <h3 style={{ fontSize: 17, fontWeight: 700, marginBottom: 10 }}>{f.title}</h3>
                 <p style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.65 }}>{f.desc}</p>
               </div>
